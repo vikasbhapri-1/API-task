@@ -4,7 +4,54 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Top 10 Live News</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  border-bottom: 1px solid #ddd;
+  padding: 0.8em 0;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+a {
+  text-decoration: none;
+  color: #007BFF;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.meta {
+  font-size: 0.9em;
+  color: #555;
+}</style>
 </head>
 <body>
   <div class="container">
@@ -14,6 +61,46 @@
     </ul>
   </div>
 
-  <script src="script.js"></script>
+  <script>const apiKey = 'fa4ab98aea9a4686a519ff3a2825edba';  // ← Replace this with your actual API key
+const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&apiKey=${apiKey}`;
+
+async function fetchNews() {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status} ${res.statusText}`);
+    }
+    const json = await res.json();
+    renderNews(json.articles);
+  } catch (err) {
+    document.getElementById('newsList').innerHTML = `<li>${err.message}</li>`;
+  }
+}
+
+function renderNews(articles) {
+  const ul = document.getElementById('newsList');
+  ul.innerHTML = '';
+  if (!articles || articles.length === 0) {
+    ul.innerHTML = '<li>No news found.</li>';
+    return;
+  }
+
+  articles.forEach(article => {
+    const li = document.createElement('li');
+    const title = article.title || 'No title';
+    const url = article.url || '#';
+    const source = (article.source && article.source.name) || 'Unknown';
+    const publishedAt = article.publishedAt ? new Date(article.publishedAt).toLocaleString() : '';
+    li.innerHTML = `
+      <a href="${url}" target="_blank" rel="noopener">${title}</a>
+      <div class="meta">${source} &ndash; ${publishedAt}</div>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+fetchNews();
+  </script>
 </body>
 </html>
+
